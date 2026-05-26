@@ -27,6 +27,7 @@ package template.storage.local
 import template.storage.local.language.LanguageDataStore
 import template.storage.local.language.LanguageSerializer
 import template.storage.local.theme.ThemeLocalDataStore
+import template.storage.local.theme.ThemeLocalDataStoreImpl
 import template.storage.local.theme.ThemeSerializer
 
 object StorageComponent {
@@ -37,7 +38,7 @@ object StorageComponent {
         ),
     )
 
-    fun createThemeDataStore(): ThemeLocalDataStore = ThemeLocalDataStore(
+    fun createThemeDataStore(): ThemeLocalDataStore = ThemeLocalDataStoreImpl(
         createDataStore(
             producePath = { producePath(DATASTORE_FILE_NAME_THEME) },
             serializer = ThemeSerializer,
