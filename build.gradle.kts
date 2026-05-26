@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -54,7 +52,7 @@ subprojects {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
             freeCompilerArgs.addAll(
-                listOf("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+                listOf("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"),
             )
         }
     }
