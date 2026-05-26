@@ -185,6 +185,82 @@ tasks.register('replaceTemplateReferences') {
 
 /**
  * --------------------------------------------
+ * APPLY APP ICONS
+ * --------------------------------------------
+ * Usage: ./gradlew applyAppIcons -Penv=debug
+ * Expected structure in root /branding folder:
+ * branding/
+ *   debug/ (or stg, prod)
+ *     android/ (contains res/ folder structure like mipmap-*)
+ *     ios/ (contains contents of AppIcon.appiconset)
+ *     desktop/ (contains icon.png, icon.ico, icon.icns)
+ *     web/ (contains favicon.ico, icon.png)
+ */
+tasks.register('applyAppIcons') {
+    group "Template Setup"
+    description "Applies branding icons from /branding/{env} to all platform modules"
+    
+    doLast {
+        def env = project.hasProperty("env") ? project.property("env") : "prod"
+        def brandingDir = file("${rootDir}/branding/${env}")
+        
+        if (!brandingDir.exists()) {
+            throw new GradleException("Branding directory not found for environment: ${env}. Please create branding/${env}/")
+        }
+
+        println "🎨 Applying branding icons for environment: ${env}..."
+
+        // 1. Android
+        def androidSource = file("${brandingDir}/android")
+        if (androidSource.exists()) {
+            // Map env to Android source sets
+            def androidTargetDir = "main"
+            if (env == "debug") androidTargetDir = "debug"
+            if (env == "stg") androidTargetDir = "staging"
+            
+            println "🤖 Updating Android icons (src/${androidTargetDir})..."
+            copy {
+                from androidSource
+                into "${rootDir}/app/src/${androidTargetDir}/res"
+            }
+        }
+
+        // 2. iOS
+        def iosSource = file("${brandingDir}/ios")
+        if (iosSource.exists()) {
+            println "🍎 Updating iOS icons..."
+            copy {
+                from iosSource
+                into "${rootDir}/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset"
+            }
+        }
+
+        // 3. Desktop
+        def desktopSource = file("${brandingDir}/desktop")
+        if (desktopSource.exists()) {
+            println "💻 Updating Desktop icons..."
+            copy {
+                from desktopSource
+                into "${rootDir}/common/src/jvmMain/resources"
+            }
+        }
+
+        // 4. Web
+        def webSource = file("${brandingDir}/web")
+        if (webSource.exists()) {
+            println "🌐 Updating Web icons..."
+            copy {
+                from webSource
+                into "${rootDir}/common/src/wasmJsMain/resources"
+            }
+        }
+        
+        println "✅ Icons applied successfully for ${env}!"
+    }
+}
+
+/**
+ * --------------------------------------------
  * CLEANUP DEPENDENCIES
  * --------------------------------------------
  */

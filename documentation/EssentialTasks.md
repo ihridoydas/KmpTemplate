@@ -40,6 +40,11 @@ This project is a Kotlin Multiplatform (KMP) project supporting Android, iOS, De
 - **Generate Documentation (Dokka)**: `./gradlew dokkaHtml`
 - **Sort Dependencies**: `./gradlew sortDependencies`
 
+## Project Setup & Branding
+- **Rename Project**: `./gradlew renameTemplate`
+- **Apply App Icons**: `./gradlew applyAppIcons -Penv={debug|stg|prod}`
+- **Details on Icons**: See [Branding README](../branding/README.md)
+
 ## Git Hooks
 - **Install Hooks**: `./gradlew installGitHooks`
 - **Copy Hooks**: `./gradlew copyGitHooks`
