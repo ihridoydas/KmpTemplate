@@ -91,6 +91,7 @@ modules.each { module ->
             def sourceSets = [
                     "commonMain", "androidMain", "iosMain", "jvmMain", "wasmJsMain",
                     "commonTest", "androidTest", "iosTest", "jvmTest", "wasmJsTest",
+                    "androidUnitTest", // Added to support Robolectric tests
                     "main", "test" // legacy/android-only
             ]
 
@@ -213,6 +214,13 @@ tasks.register('keepOrRemoveDependencies') {
  * MAIN ENTRY POINT
  * --------------------------------------------
  */
+tasks.register("cleanupSetup") {
+    doLast {
+        removeTextFromFile("${rootDir}/build.gradle.kts", "setup.gradle")
+        delete("${rootDir}/buildscripts/setup.gradle")
+    }
+}
+
 tasks.register('renameTemplate') {
     group "Template Setup"
     dependsOn(
@@ -220,12 +228,7 @@ tasks.register('renameTemplate') {
             modules.collect { tasks.named("renameAppPackage${it}") },
             keepOrRemoveDependencies,
             replaceTemplateReferences,
-            tasks.register("cleanupSetup") {
-                doLast {
-                    removeTextFromFile("${rootDir}/build.gradle.kts", "setup.gradle")
-                    delete("${rootDir}/buildscripts/setup.gradle")
-                }
-            }
+            "cleanupSetup"
     )
     doLast {
         println("✅ KmpTemplate successfully converted to ${renameConfig.newTemplateAppId}")
