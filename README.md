@@ -5,6 +5,7 @@ Kickstart your **Kotlin Multiplatform (KMP)** development with this KmpTemplate.
 ## Why KmpTemplate?
 
 - **Multiplatform by Default:** Shared logic and UI (Compose Multiplatform) for Android, iOS, Desktop, and Web.
+- **Full Testing Suite:** Logic and UI tests run cross-platform (Android via Robolectric, iOS, JVM, Web). See [Testing Strategy](documentation/Testing.md).
 - **Opinionated Tooling:** Configured dependency management, git hooks, code formatting, and static analysis for enhanced development.
 - **Smart Setup:** A custom script to rename your project, package IDs, and toggle essential KMP libraries in seconds.
 

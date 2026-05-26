@@ -30,6 +30,8 @@ This project is a Kotlin Multiplatform (KMP) project supporting Android, iOS, De
 ## Testing (Shared)
 - **Run All Tests**: `./gradlew allTests`
 - **Run Shared Common Tests**: `./gradlew :common:allTests`
+- **Android UI/Unit Tests (Local)**: `./gradlew :common:testDebugUnitTest` (Uses Robolectric)
+- **Detailed Testing Info**: See [Testing Strategy](Testing.md)
 
 ## Code Quality & Documentation
 - **Run Static Analysis (Detekt)**: `./gradlew detektAll`
