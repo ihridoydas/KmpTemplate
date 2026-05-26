@@ -1,0 +1,58 @@
+name: Rename Template
+
+# This will cancel any in progress workflows for the same PR, if
+# multiple pushes happen in quick succession.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on: pull_request
+
+jobs:
+  rename-template:
+    strategy:
+      matrix:
+        useHiltDependencies: [true, false]
+        useRoomDependencies: [true, false]
+        useRetrofitDependencies: [true, false]
+        usePaparazziDependencies: [true, false]
+
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/workflow_setup
+
+      - name: Set useHiltDependencies
+        run: |
+          sed -i '' 's/useHiltDependencies.* : true/useHiltDependencies : ${{ matrix.useHiltDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Set useRoomDependencies
+        run: |
+          sed -i '' 's/useRoomDependencies.* : true/useRoomDependencies : ${{ matrix.useRoomDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Set useRetrofitDependencies
+        run: |
+          sed -i '' 's/useRetrofitDependencies.* : true/useRetrofitDependencies : ${{ matrix.useRetrofitDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Set usePaparazziDependencies
+        run: |
+          sed -i '' 's/usePaparazziDependencies.* : true/usePaparazziDependencies : ${{ matrix.usePaparazziDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Set useRenovateDependencies
+        run: |
+          sed -i '' 's/useRenovateDependencies.* : true/useRenovateDependencies : ${{ matrix.keepCustomizableDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Set useAndroidXR
+        run: |
+          sed -i '' 's/useAndroidXR.* : false/useAndroidXR : ${{ matrix.keepCustomizableDependencies }}/g' buildscripts/setup.gradle
+
+      - name: Rename
+        run: ./gradlew renameTemplate
+
+      - name: Lint Checks
+        run: ./gradlew detektAll lintKotlin lint
+
+      - name: Build
+        run: ./gradlew assembleDebug
