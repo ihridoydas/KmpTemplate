@@ -6,7 +6,15 @@ The script `./gradlew applyAppIcons -Penv={debug|stg|prod}` will automatically d
 ## Folder Structure
 
 ### 1. `android/`
-Put your `mipmap-*` folders here.
+Put your full resource structure here.
+- For **Adaptive Icons**, include:
+  - `mipmap-anydpi-v26/ic_launcher.xml`
+  - `mipmap-anydpi-v26/ic_launcher_round.xml`
+  - `drawable/ic_launcher_background.xml` (or .png)
+  - `drawable/ic_launcher_foreground.xml` (or .png)
+- For legacy icons, include the various `mipmap-hdpi`, `mipmap-xhdpi`, etc., folders.
+
+**Target Mapping:**
 - `debug` copies to `app/src/debug/res/`
 - `stg` copies to `app/src/staging/res/`
 - `prod` copies to `app/src/main/res/`
