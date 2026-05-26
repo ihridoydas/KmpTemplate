@@ -48,10 +48,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import template.common.components.AppBar
 import template.common.generated.resources.Res
 import template.common.generated.resources.nice_to_meet_you
 import template.common.generated.resources.welcome
-import template.common.components.AppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +62,7 @@ fun ViewScreen(onBackPress: () -> Unit) {
             AppBar(
                 title = stringResource(Res.string.welcome),
                 navIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                onNav = onBackPress
+                onNav = onBackPress,
             )
         },
         content = {

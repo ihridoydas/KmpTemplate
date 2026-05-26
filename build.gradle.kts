@@ -24,6 +24,7 @@ plugins {
 apply(from = "buildscripts/githooks.gradle")
 apply(from = "buildscripts/setup.gradle")
 apply(from = "buildscripts/versionsplugin.gradle")
+apply(from = "spotless.gradle")
 
 subprojects {
     apply(plugin = "org.jetbrains.dokka")

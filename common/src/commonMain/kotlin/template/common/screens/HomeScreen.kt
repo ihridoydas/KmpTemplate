@@ -46,23 +46,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import template.common.generated.resources.Res
 import template.common.generated.resources.app_name
 import template.common.generated.resources.hello_developer
-import template.storage.local.theme.ThemeLocalDataStore
-import template.storage.local.theme.ThemeMode
-import template.navigation.Navigator
-import template.navigation.ScreenDestinations
 import template.common.ui.LanguageDropdown
 import template.common.ui.ThemeToggleButton
-
-import org.koin.compose.koinInject
+import template.navigation.Navigator
+import template.navigation.ScreenDestinations
+import template.storage.local.theme.ThemeLocalDataStore
+import template.storage.local.theme.ThemeMode
 
 @Composable
-fun HomeScreen(
-    navigator: Navigator,
-    themeDataStore: ThemeLocalDataStore = koinInject(),
-) {
+fun HomeScreen(navigator: Navigator, themeDataStore: ThemeLocalDataStore = koinInject()) {
     println("HomeScreen: Recomposing")
     val themeMode by themeDataStore.themeMode
         .collectAsState(initial = ThemeMode.SYSTEM)
@@ -77,7 +73,7 @@ fun HomeScreen(
                 .statusBarsPadding()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             LanguageDropdown()
             ThemeToggleButton(

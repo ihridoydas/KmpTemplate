@@ -31,10 +31,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import org.koin.android.ext.android.get
 import template.common.App
+import template.common.util.PlatformUtils
 import template.common.utils.RootUtil
 import template.theme.splashScreen.SplashViewModel
 import timber.log.Timber
-import template.common.util.PlatformUtils
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                 },
                 onThemeChange = { isDark ->
                     PlatformUtils.changeTheme(isDark)
-                }
+                },
             )
         }
     }

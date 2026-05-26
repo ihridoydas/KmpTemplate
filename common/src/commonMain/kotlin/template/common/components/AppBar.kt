@@ -36,11 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppBar(
-    title: String,
-    navIcon: ImageVector? = null,
-    onNav: () -> Unit = {},
-) {
+fun AppBar(title: String, navIcon: ImageVector? = null, onNav: () -> Unit = {}) {
     TopAppBar(
         windowInsets = TopAppBarDefaults.windowInsets,
         colors = TopAppBarDefaults.topAppBarColors(

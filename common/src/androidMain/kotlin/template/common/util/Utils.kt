@@ -32,10 +32,7 @@ import template.storage.local.language.Language
 import java.util.Locale
 
 object Utils {
-    fun applyLanguage(
-        context: Context,
-        language: Language,
-    ) {
+    fun applyLanguage(context: Context, language: Language) {
         val code = when (language) {
             Language.SYSTEM -> Locale.getDefault().language
             Language.ENGLISH -> "en"

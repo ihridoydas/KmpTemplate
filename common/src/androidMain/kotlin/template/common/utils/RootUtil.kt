@@ -57,7 +57,10 @@ actual object RootUtil {
     /**
      * ルート化された端末かどうか確認する.
      */
-    actual fun isDeviceRooted(): Boolean = false // Disabled for Multiplatform development/emulators
+    actual fun isDeviceRooted(): Boolean {
+        // Return false for emulators/development if preferred, but here we run the checks
+        return checkRootBuild() || checkRootApps() || checkRootSu()
+    }
 
     /**
      * テストビルドやカスタム ROM の兆候を確認する.

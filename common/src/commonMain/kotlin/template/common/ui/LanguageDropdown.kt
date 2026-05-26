@@ -44,13 +44,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import template.storage.local.language.Language
-
 import org.koin.compose.koinInject
+import template.storage.local.language.Language
 
 @Composable
 fun LanguageDropdown() {
-    val currentLanguage by template.common.util.LanguageManager.currentLanguage.collectAsState()
+    val currentLanguage by template.common.util.LanguageManager.currentLanguage
+        .collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -85,7 +85,8 @@ fun LanguageDropdown() {
                 },
                 onClick = {
                     expanded = false
-                    template.common.util.LanguageManager.setLanguage(Language.SYSTEM)
+                    template.common.util.LanguageManager
+                        .setLanguage(Language.SYSTEM)
                 },
             )
             // English
@@ -101,7 +102,8 @@ fun LanguageDropdown() {
                 },
                 onClick = {
                     expanded = false
-                    template.common.util.LanguageManager.setLanguage(Language.ENGLISH)
+                    template.common.util.LanguageManager
+                        .setLanguage(Language.ENGLISH)
                 },
             )
             // Japanese
@@ -117,14 +119,15 @@ fun LanguageDropdown() {
                 },
                 onClick = {
                     expanded = false
-                    template.common.util.LanguageManager.setLanguage(Language.JAPANESE)
+                    template.common.util.LanguageManager
+                        .setLanguage(Language.JAPANESE)
                 },
             )
             // Bangla
             DropdownMenuItem(
                 text = {
                     Row {
-                        Text(if(currentLanguage == Language.BENGALI) "বাংলা" else "Bangla")
+                        Text(if (currentLanguage == Language.BENGALI) "বাংলা" else "Bangla")
                         if (currentLanguage == Language.BENGALI) {
                             Spacer(Modifier.width(5.dp))
                             Text("✓")
@@ -133,7 +136,8 @@ fun LanguageDropdown() {
                 },
                 onClick = {
                     expanded = false
-                    template.common.util.LanguageManager.setLanguage(Language.BENGALI)
+                    template.common.util.LanguageManager
+                        .setLanguage(Language.BENGALI)
                 },
             )
         }

@@ -111,6 +111,12 @@ androidComponents {
 }
 
 dependencies {
+    implementation(compose.components.resources)
+    implementation(compose.foundation)
+    implementation(compose.material3)
+    // Use Compose Multiplatform dependencies
+    implementation(compose.runtime)
+    implementation(compose.ui)
     // UI
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.android.material)
@@ -119,17 +125,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
-    
-    // Use Compose Multiplatform dependencies
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material3)
-    implementation(compose.ui)
-    implementation(compose.components.resources)
-
-    // Koin
-    implementation(libs.koin.android)
-    implementation(libs.koin.compose)
     // Network and Local
     implementation(libs.androidx.room.runtime)
     implementation(libs.bundles.androidx.xr)
@@ -138,6 +133,9 @@ dependencies {
     implementation(libs.compose.ui.tooling)
     // Storage
     implementation(libs.datastore.android)
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
     implementation(libs.timber)
     //Module
     implementation(projects.common)

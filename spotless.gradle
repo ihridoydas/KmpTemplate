@@ -10,10 +10,14 @@ spotless {
     }
     kotlin {
         target "**/*.kt"
+        targetExclude "spotless/*.kt"
         trimTrailingWhitespace()
-        ktlint()
+        ktlint().editorConfigOverride([
+            "standard:filename": "disabled",
+            "standard:backing-property-naming": "disabled"
+        ])
         indentWithSpaces()
         endWithNewline()
-        licenseHeaderFile (rootProject.file("spotless/copyright.kt"))
+        licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
 }

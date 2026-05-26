@@ -35,11 +35,7 @@ import androidx.compose.ui.Modifier
 import template.storage.local.theme.ThemeMode
 
 @Composable
-fun ThemeToggleButton(
-    themeMode: ThemeMode,
-    onToggle: (ThemeMode) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun ThemeToggleButton(themeMode: ThemeMode, onToggle: (ThemeMode) -> Unit, modifier: Modifier = Modifier) {
     val isDark = when (themeMode) {
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
@@ -55,11 +51,11 @@ fun ThemeToggleButton(
     ) {
         Icon(
             imageVector =
-                if (isDark) {
-                    Icons.Default.DarkMode
-                } else {
-                    Icons.Default.LightMode
-                },
+            if (isDark) {
+                Icons.Default.DarkMode
+            } else {
+                Icons.Default.LightMode
+            },
             contentDescription = "Toggle Theme",
         )
     }

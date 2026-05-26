@@ -34,6 +34,11 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             }
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.junit)
+            }
+        }
     }
 }
 
