@@ -25,13 +25,14 @@
 package template.storage.local
 
 import template.storage.local.language.LanguageDataStore
+import template.storage.local.language.LanguageDataStoreImpl
 import template.storage.local.language.LanguageSerializer
 import template.storage.local.theme.ThemeLocalDataStore
 import template.storage.local.theme.ThemeLocalDataStoreImpl
 import template.storage.local.theme.ThemeSerializer
 
 object StorageComponent {
-    fun createLanguageDataStore(): LanguageDataStore = LanguageDataStore(
+    fun createLanguageDataStore(): LanguageDataStore = LanguageDataStoreImpl(
         createDataStore(
             producePath = { producePath(DATASTORE_FILE_NAME_LANGUAGE) },
             serializer = LanguageSerializer,

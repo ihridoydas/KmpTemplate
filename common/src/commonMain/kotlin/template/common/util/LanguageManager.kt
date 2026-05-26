@@ -64,6 +64,15 @@ object LanguageManager {
         }
     }
 
+    /**
+     * Resets the manager state for testing purposes.
+     */
+    fun resetForTesting() {
+        isInitialized = false
+        dataStore = null
+        _currentLanguage.value = Language.UNKNOWN
+    }
+
     fun setLanguage(language: Language) {
         println("LanguageManager: setLanguage -> $language")
         _currentLanguage.value = language
