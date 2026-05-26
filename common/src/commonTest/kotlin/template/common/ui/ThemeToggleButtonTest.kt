@@ -4,12 +4,13 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
+import template.common.BaseComposeTest
 import template.storage.local.theme.ThemeMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalTestApi::class)
-class ThemeToggleButtonTest {
+class ThemeToggleButtonTest : BaseComposeTest() {
 
     @Test
     fun testToggleThemeClick() = runComposeUiTest {

@@ -77,6 +77,11 @@ kotlin {
                 implementation(libs.ktor.client.android)
             }
         }
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.robolectric)
+            }
+        }
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -86,6 +91,8 @@ kotlin {
         }
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
+        val iosArm64Test by getting
+        val iosSimulatorArm64Test by getting
         val iosMain by creating {
             dependsOn(commonMain)
             iosArm64Main.dependsOn(this)
@@ -94,7 +101,16 @@ kotlin {
                 implementation(libs.ktor.client.darwin)
             }
         }
+        val iosTest by creating {
+            dependsOn(commonTest)
+            iosArm64Test.dependsOn(this)
+            iosSimulatorArm64Test.dependsOn(this)
+        }
     }
+}
+
+dependencies {
+    "debugImplementation"(libs.compose.ui.test.manifest)
 }
 
 compose.desktop {
@@ -123,6 +139,15 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.systemProperty("robolectric.enabledSdks", "34")
+            }
+        }
     }
 }
 
