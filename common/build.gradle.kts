@@ -80,6 +80,7 @@ kotlin {
         val androidUnitTest by getting {
             dependencies {
                 implementation(libs.robolectric)
+                implementation(libs.compose.ui.test.manifest)
             }
         }
         val jvmMain by getting {
