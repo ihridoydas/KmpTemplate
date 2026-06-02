@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "extends": [
+    "config:recommended"
+  ],
+
+  "timezone": "Asia/Tokyo",
+
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+
+  "dependencyDashboard": true,
+
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "groupName": "Gradle Dependencies"
+    },
+
+    {
+      "matchPackageNames": [
+        "org.jetbrains.kotlin:kotlin-gradle-plugin",
+        "org.jetbrains.kotlin.multiplatform"
+      ],
+      "groupName": "Kotlin Updates"
+    },
+
+    {
+      "matchPackageNames": [
+        "com.android.application",
+        "com.android.library",
+        "com.android.tools.build:gradle"
+      ],
+      "groupName": "Android Gradle Plugin"
+    },
+
+    {
+      "matchPackagePrefixes": [
+        "org.jetbrains.compose"
+      ],
+      "groupName": "Compose Multiplatform"
+    },
+
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": false
+    }
+  ]
+}
