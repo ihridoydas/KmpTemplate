@@ -41,9 +41,17 @@ if (projectRootMarker.exists()) {
         println "⚠️ Project folder moved from ${oldPath} to ${currentPath}"
         println "⚠️ Performing deep clean of stale Gradle caches..."
         
-        // Use Ant to delete directories safely during configuration
+        // Delete root caches
         ant.delete(dir: "${rootDir}/.gradle")
         ant.delete(dir: "${rootDir}/build")
+
+        // Deep clean: find and delete all 'build' and '.kotlin' folders in subprojects
+        file(rootDir).eachDirRecurse { dir ->
+            if (dir.isDirectory() && (dir.name == "build" || dir.name == ".kotlin" || dir.name == ".gradle")) {
+                println "  - Removing stale directory: ${dir}"
+                ant.delete(dir: dir)
+            }
+        }
         
         println "✅ Deep clean completed. Please re-sync the project."
     }
