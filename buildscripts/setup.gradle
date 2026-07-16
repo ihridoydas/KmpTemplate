@@ -29,34 +29,50 @@ def renameConfig = [
  * --------------------------------------------
  * AUTO FIX: PROJECT PATH CHANGE CLEAN
  * --------------------------------------------
- * Detects if the project folder has moved and performs a deep clean.
- * Runs during the configuration phase to prevent "outside root directory" errors.
  */
 def projectRootMarker = file("${rootDir}/.projectRootPath")
 def currentPath = rootDir.absolutePath
+
+def performDeepClean = {
+    println "⚠️ Performing deep clean of stale Gradle caches and build artifacts..."
+    
+    // Stop Gradle daemons to release file locks
+    try {
+        exec { commandLine "./gradlew", "--stop" }
+    } catch (Exception e) {
+        println "  (Could not stop daemons automatically, proceeding...)"
+    }
+
+    // Delete root caches and build
+    ant.delete(dir: "${rootDir}/.gradle")
+    ant.delete(dir: "${rootDir}/build")
+
+    // Deep clean: find and delete all 'build', '.kotlin', and module '.gradle' folders
+    file(rootDir).eachDirRecurse { dir ->
+        if (dir.isDirectory() && (dir.name == "build" || dir.name == ".kotlin" || dir.name == ".gradle")) {
+            println "  - Removing: ${dir}"
+            ant.delete(dir: dir)
+        }
+    }
+    println "✅ Deep clean completed. Please re-sync the project."
+}
 
 if (projectRootMarker.exists()) {
     def oldPath = projectRootMarker.text.trim()
     if (oldPath != currentPath) {
         println "⚠️ Project folder moved from ${oldPath} to ${currentPath}"
-        println "⚠️ Performing deep clean of stale Gradle caches..."
-        
-        // Delete root caches
-        ant.delete(dir: "${rootDir}/.gradle")
-        ant.delete(dir: "${rootDir}/build")
-
-        // Deep clean: find and delete all 'build' and '.kotlin' folders in subprojects
-        file(rootDir).eachDirRecurse { dir ->
-            if (dir.isDirectory() && (dir.name == "build" || dir.name == ".kotlin" || dir.name == ".gradle")) {
-                println "  - Removing stale directory: ${dir}"
-                ant.delete(dir: dir)
-            }
-        }
-        
-        println "✅ Deep clean completed. Please re-sync the project."
+        performDeepClean()
     }
 }
 projectRootMarker.text = currentPath
+
+tasks.register("deepClean") {
+    group = "Template Setup"
+    description = "Forcefully removes all build directories and Gradle caches"
+    doLast {
+        performDeepClean()
+    }
+}
 
 tasks.register("checkProjectPathChange") {
     group = "Template Setup"
@@ -329,6 +345,7 @@ tasks.register("cleanupSetup") {
 tasks.register('renameTemplate') {
     group "Template Setup"
     dependsOn(
+            deepClean,
             checkProjectPathChange,
             modules.collect { tasks.named("renameAppPackage${it}") },
             keepOrRemoveDependencies,
