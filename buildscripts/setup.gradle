@@ -48,12 +48,19 @@ def performDeepClean = {
     ant.delete(dir: "${rootDir}/build")
 
     // Deep clean: find and delete all 'build', '.kotlin', and module '.gradle' folders
-    file(rootDir).eachDirRecurse { dir ->
-        if (dir.isDirectory() && (dir.name == "build" || dir.name == ".kotlin" || dir.name == ".gradle")) {
-            println "  - Removing: ${dir}"
-            ant.delete(dir: dir)
+    def cleanRecursive
+    cleanRecursive = { File dir ->
+        if (!dir.exists()) return
+        dir.eachDir { subDir ->
+            if (subDir.name == "build" || subDir.name == ".kotlin" || subDir.name == ".gradle") {
+                println "  - Removing: ${subDir}"
+                ant.delete(dir: subDir)
+            } else if (subDir.name != ".git" && subDir.name != ".idea") {
+                cleanRecursive(subDir)
+            }
         }
     }
+    cleanRecursive(file(rootDir))
     println "✅ Deep clean completed. Please re-sync the project."
 }
 
