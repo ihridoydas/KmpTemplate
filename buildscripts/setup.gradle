@@ -1,4 +1,5 @@
 import java.util.regex.Pattern
+import java.util.regex.Matcher
 
 /**
  * ----------------------------------------------------------------------------
@@ -141,7 +142,7 @@ tasks.register('replaceTemplateReferences') {
             if (moduleGradle.exists()) {
                 def text = moduleGradle.text
                 text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}"/, "namespace = \"${renameConfig.newTemplateAppId}\"")
-                text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}\.[^"]+"/, "namespace = \"${renameConfig.newTemplateAppId}.\${project.name}\"")
+                text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}\.[^"]+"/, "namespace = \"${renameConfig.newTemplateAppId}." + Matcher.quoteReplacement('${project.name}') + "\"")
                 text = text.replaceAll(/applicationId\s*=\s*"${renameConfig.templateAppId}"/, "applicationId = \"${renameConfig.newTemplateAppId}\"")
                 text = text.replaceAll(/baseName\s*=\s*"${renameConfig.templateName}"/, "baseName = \"${renameConfig.newTemplateName.toLowerCase()}\"")
                 text = text.replaceAll(/packageOfResClass\s*=\s*"${renameConfig.templateName}/, "packageOfResClass = \"${renameConfig.newTemplateAppId}")
