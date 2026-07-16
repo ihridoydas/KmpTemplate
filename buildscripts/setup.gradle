@@ -29,24 +29,31 @@ def renameConfig = [
  * --------------------------------------------
  * AUTO FIX: PROJECT PATH CHANGE CLEAN
  * --------------------------------------------
+ * Detects if the project folder has moved and performs a deep clean.
+ * Runs during the configuration phase to prevent "outside root directory" errors.
  */
 def projectRootMarker = file("${rootDir}/.projectRootPath")
+def currentPath = rootDir.absolutePath
+
+if (projectRootMarker.exists()) {
+    def oldPath = projectRootMarker.text.trim()
+    if (oldPath != currentPath) {
+        println "⚠️ Project folder moved from ${oldPath} to ${currentPath}"
+        println "⚠️ Performing deep clean of stale Gradle caches..."
+        
+        // Use Ant to delete directories safely during configuration
+        ant.delete(dir: "${rootDir}/.gradle")
+        ant.delete(dir: "${rootDir}/build")
+        
+        println "✅ Deep clean completed. Please re-sync the project."
+    }
+}
+projectRootMarker.text = currentPath
 
 tasks.register("checkProjectPathChange") {
     group = "Template Setup"
     doLast {
-        def currentPath = rootDir.absolutePath
-        if (projectRootMarker.exists()) {
-            def oldPath = projectRootMarker.text.trim()
-            if (oldPath != currentPath) {
-                println "⚠️ Project folder moved! Performing deep clean..."
-                exec { commandLine "./gradlew", "--stop" }
-                delete("${rootDir}/.gradle", "${rootDir}/build")
-                rootProject.subprojects.each { delete("${it.projectDir}/build") }
-                println "✅ Deep clean completed"
-            }
-        }
-        projectRootMarker.text = currentPath
+        println "✅ Project path is up to date: ${currentPath}"
     }
 }
 
