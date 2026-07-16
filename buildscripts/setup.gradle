@@ -99,28 +99,41 @@ modules.each { module ->
             def sourceSets = [
                     "commonMain", "androidMain", "iosMain", "jvmMain", "wasmJsMain",
                     "commonTest", "androidTest", "iosTest", "jvmTest", "wasmJsTest",
-                    "androidUnitTest", // Added to support Robolectric tests
-                    "main", "test" // legacy/android-only
+                    "androidUnitTest", 
+                    "main", "test"
             ]
 
             sourceSets.each { sourceSet ->
                 ["kotlin", "java"].each { lang ->
-                    def oldDir = file("${rootDir}/${module}/src/${sourceSet}/${lang}/${templateName}")
-                    if (oldDir.exists()) {
-                        println("📦 Renaming ${module} ${sourceSet}/${lang}")
-                        def newDirFile = file("${rootDir}/${module}/src/${sourceSet}/${lang}/${newDir}")
-                        copy {
-                            from(oldDir)
-                            into(newDirFile)
-                            include("**/*.kt", "**/*.java")
-                            filter { line ->
-                                line.replace("package ${templateName}", "package ${newAppId}")
-                                    .replace("import ${templateName}", "import ${newAppId}")
-                                    .replace("${templateName}.", "${newAppId}.")
-                                    .replace(renameConfig.templateMaterialThemeName, renameConfig.newMaterialThemeName)
+                    def srcDir = file("${rootDir}/${module}/src/${sourceSet}/${lang}")
+                    if (srcDir.exists()) {
+                        // 1. First, replace all package/import strings in ALL files in this source set
+                        srcDir.eachFileRecurse { file ->
+                            if (file.isFile() && (file.name.endsWith(".kt") || file.name.endsWith(".java"))) {
+                                def text = file.text
+                                def updatedText = text.replaceAll(/package\s+${templateName}/, "package ${newAppId}")
+                                                     .replaceAll(/import\s+${templateName}/, "import ${newAppId}")
+                                                     .replaceAll(/(?<![a-zA-Z0-9_])${templateName}\./, "${newAppId}.")
+                                                     .replace(renameConfig.templateMaterialThemeName, renameConfig.newMaterialThemeName)
+                                if (text != updatedText) {
+                                    file.text = updatedText
+                                }
                             }
                         }
-                        oldDir.deleteDir()
+
+                        // 2. Then, move the 'template' directory to the new package structure
+                        def oldPkgDir = file("${srcDir}/${templateName}")
+                        if (oldPkgDir.exists()) {
+                            println("📦 Relocating ${module} ${sourceSet}/${lang} ${templateName} -> ${newDir}")
+                            def newPkgDir = file("${srcDir}/${newDir}")
+                            
+                            // Ensure the parent directory exists
+                            newPkgDir.parentFile.mkdirs()
+                            
+                            ant.move(todir: newPkgDir) {
+                                fileset(dir: oldPkgDir)
+                            }
+                        }
                     }
                 }
             }
@@ -138,11 +151,13 @@ tasks.register('replaceTemplateReferences') {
     doLast {
         modules.each { module ->
             // Manifests
-            def manifest = file("${rootDir}/${module}/src/androidMain/AndroidManifest.xml")
-            if (!manifest.exists()) manifest = file("${rootDir}/${module}/src/main/AndroidManifest.xml")
-            if (manifest.exists()) {
+            def manifests = fileTree(dir: "${rootDir}/${module}/src", include: "**/AndroidManifest.xml")
+            manifests.each { manifest ->
+                println "📜 Updating Manifest: ${manifest.name}"
                 replaceTextInFile(manifest.absolutePath, "${renameConfig.templateName}.MainActivity", "${renameConfig.newTemplateAppId}.MainActivity")
+                replaceTextInFile(manifest.absolutePath, "android:name=\"${renameConfig.templateName}.", "android:name=\"${renameConfig.newTemplateAppId}.")
                 replaceTextInFile(manifest.absolutePath, "package=\"${renameConfig.templateName}\"", "package=\"${renameConfig.newTemplateAppId}\"")
+                replaceTextInFile(manifest.absolutePath, "package=\"${renameConfig.templateName}.", "package=\"${renameConfig.newTemplateAppId}.")
             }
 
             // build.gradle.kts
@@ -150,10 +165,12 @@ tasks.register('replaceTemplateReferences') {
             if (moduleGradle.exists()) {
                 def text = moduleGradle.text
                 text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}"/, "namespace = \"${renameConfig.newTemplateAppId}\"")
-                text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}\.[^"]+"/, "namespace = \"${renameConfig.newTemplateAppId}." + Matcher.quoteReplacement('${project.name}') + "\"")
+                text = text.replaceAll(/namespace\s*=\s*"${renameConfig.templateName}\.([^"]+)"/, "namespace = \"${renameConfig.newTemplateAppId}.\$1\"")
                 text = text.replaceAll(/applicationId\s*=\s*"${renameConfig.templateAppId}"/, "applicationId = \"${renameConfig.newTemplateAppId}\"")
                 text = text.replaceAll(/baseName\s*=\s*"${renameConfig.templateName}"/, "baseName = \"${renameConfig.newTemplateName.toLowerCase()}\"")
-                text = text.replaceAll(/packageOfResClass\s*=\s*"${renameConfig.templateName}/, "packageOfResClass = \"${renameConfig.newTemplateAppId}")
+                text = text.replaceAll(/packageOfResClass\s*=\s*"${renameConfig.templateName}\.([^"]+)"/, "packageOfResClass = \"${renameConfig.newTemplateAppId}.\$1\"")
+                text = text.replaceAll(/mainClass\s*=\s*"${renameConfig.templateName}\.([^"]+)"/, "mainClass = \"${renameConfig.newTemplateAppId}.\$1\"")
+                text = text.replaceAll(/packageName\s*=\s*"${renameConfig.templateName}\.([^"]+)"/, "packageName = \"${renameConfig.newTemplateAppId}.\$1\"")
                 moduleGradle.text = text
             }
         }
@@ -170,7 +187,12 @@ tasks.register('replaceTemplateReferences') {
         // Extra UI and Resources
         replaceTextInFile("${rootDir}/app/src/main/res/values/strings.xml", ">KmpTemplate<", ">${renameConfig.newTemplateName}<")
         replaceTextInFile("${rootDir}/common/src/wasmJsMain/resources/index.html", "<title>KmpTemplate</title>", "<title>${renameConfig.newTemplateName}</title>")
-        replaceTextInFile("${rootDir}/common/src/jvmMain/kotlin/main.kt", "title = \"KmpTemplate\"", "title = \"${renameConfig.newTemplateName}\"")
+        
+        // Catch all remaining "template." strings in Kotlin/Java files (e.g. fully qualified names in code)
+        fileTree(dir: rootDir, include: ["**/*.kt", "**/*.java", "**/*.kts"]).each { file ->
+            if (file.path.contains(".gradle") || file.path.contains(".idea") || file.path.contains("buildscripts")) return
+            replaceTextInFile(file.absolutePath, "${renameConfig.templateName}.", "${renameConfig.newTemplateAppId}.")
+        }
 
         // iOS Bundle Identifiers
         def pbxproj = file("${rootDir}/iosApp/iosApp.xcodeproj/project.pbxproj")
@@ -184,7 +206,6 @@ tasks.register('replaceTemplateReferences') {
         readmes.each { readme ->
             replaceTextInFile("${rootDir}/${readme}", "# KmpTemplate", "# ${renameConfig.newTemplateName}")
             replaceTextInFile("${rootDir}/${readme}", "## Why KmpTemplate?", "## Why ${renameConfig.newTemplateName}?")
-            // Translation specific headers
             replaceTextInFile("${rootDir}/${readme}", "## なぜ KmpTemplate？", "## なぜ ${renameConfig.newTemplateName}？")
             replaceTextInFile("${rootDir}/${readme}", "## কেন KmpTemplate?", "## কেন ${renameConfig.newTemplateName}?")
             replaceTextInFile("${rootDir}/${readme}", "## KmpTemplate क्यों?", "## ${renameConfig.newTemplateName} क्यों?")
@@ -196,14 +217,6 @@ tasks.register('replaceTemplateReferences') {
  * --------------------------------------------
  * APPLY APP ICONS
  * --------------------------------------------
- * Usage: ./gradlew applyAppIcons -Penv=debug
- * Expected structure in root /branding folder:
- * branding/
- *   debug/ (or stg, prod)
- *     android/ (contains res/ folder structure like mipmap-*)
- *     ios/ (contains contents of AppIcon.appiconset)
- *     desktop/ (contains icon.png, icon.ico, icon.icns)
- *     web/ (contains favicon.ico, icon.png)
  */
 tasks.register('applyAppIcons') {
     group "Template Setup"
@@ -222,7 +235,6 @@ tasks.register('applyAppIcons') {
         // 1. Android
         def androidSource = file("${brandingDir}/android")
         if (androidSource.exists()) {
-            // Map env to Android source sets
             def androidTargetDir = "main"
             if (env == "debug") androidTargetDir = "debug"
             if (env == "stg") androidTargetDir = "staging"
