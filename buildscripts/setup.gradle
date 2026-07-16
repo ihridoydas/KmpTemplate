@@ -109,6 +109,7 @@ modules.each { module ->
                             filter { line ->
                                 line.replace("package ${templateName}", "package ${newAppId}")
                                     .replace("import ${templateName}", "import ${newAppId}")
+                                    .replace("${templateName}.", "${newAppId}.")
                                     .replace(renameConfig.templateMaterialThemeName, renameConfig.newMaterialThemeName)
                             }
                         }
