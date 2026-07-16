@@ -21,7 +21,7 @@ def renameConfig = [
         useKtor                  : true,
         useRoomKmp               : true,
         useComposeMultiplatform  : true,
-        useAndroidXR             : false,
+        useAndroidXR             : true,
 ]
 
 /**
