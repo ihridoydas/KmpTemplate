@@ -75,9 +75,9 @@ class LanguageManagerTest {
     fun testInitialSyncWithSystemDefault() = runTest(testDispatcher) {
         val mockDs = MockLanguageDataStore(Language.UNKNOWN)
         LanguageManager.init(mockDs)
-        
+
         advanceUntilIdle()
-        
+
         assertEquals(Language.SYSTEM, LanguageManager.currentLanguage.value)
     }
 
@@ -85,9 +85,9 @@ class LanguageManagerTest {
     fun testInitialSyncWithSavedLanguage() = runTest(testDispatcher) {
         val mockDs = MockLanguageDataStore(Language.JAPANESE)
         LanguageManager.init(mockDs)
-        
+
         advanceUntilIdle()
-        
+
         assertEquals(Language.JAPANESE, LanguageManager.currentLanguage.value)
     }
 
@@ -148,9 +148,9 @@ class LanguageManagerTest {
     @Test
     fun testSetLanguageWithoutInit() = runTest(testDispatcher) {
         // We don't call LanguageManager.init()
-        
+
         LanguageManager.setLanguage(Language.BENGALI)
-        
+
         assertEquals(Language.BENGALI, LanguageManager.currentLanguage.value)
         // No crash should occur, even though dataStore is null
     }

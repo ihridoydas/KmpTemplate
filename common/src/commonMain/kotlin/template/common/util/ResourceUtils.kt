@@ -48,6 +48,7 @@ fun ProvideAppLocale(languageCode: String, isDarkTheme: Boolean, content: @Compo
     val customEnv = remember(languageCode, isDarkTheme, systemEnv) {
         ResourceEnvironment(
             language = if (languageCode.isEmpty()) systemEnv.language else LanguageQualifier(languageCode),
+            script = systemEnv.script,
             region = systemEnv.region,
             theme = if (isDarkTheme) ThemeQualifier.DARK else ThemeQualifier.LIGHT,
             density = systemEnv.density,

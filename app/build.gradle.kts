@@ -111,6 +111,11 @@ androidComponents {
 }
 
 dependencies {
+    //Module
+    implementation(projects.common)
+    implementation(projects.navigation)
+    implementation(projects.storage)
+    implementation(projects.theme)
     implementation(compose.components.resources)
     implementation(compose.foundation)
     implementation(compose.material3)
@@ -137,11 +142,6 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.timber)
-    //Module
-    implementation(projects.common)
-    implementation(projects.navigation)
-    implementation(projects.storage)
-    implementation(projects.theme)
 
     debugImplementation(compose.uiTooling)
     // Others
